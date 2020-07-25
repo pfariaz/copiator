@@ -51,15 +51,21 @@ def process_copy(path_to_search, path_to_copy):
     total_copied_files = 0
     total_files_not_match = 0
     total_files_destination = 0
+    total_files_not_mp3 = 0
     if len(dir_search) == 0:
         print_error("There are no files in this directory :(")
     for filename in dir_search:
         full_path_file = join(path_to_search, filename)
         if isfile(full_path_file):
-            if filename in files_to_copy:
+            files_splitted = filename.split(".")
+            if files_splitted[0] in files_to_copy:
                 if not exists(join(path_to_copy, filename)):
                     copy(full_path_file, path_to_copy)
-                    print_success("--> File: \"%s\" copied successfully !" % filename)
+                    if files_splitted[1] is not "mp3":
+                        print_error("--> File: \"%s\" copied successfully but is not a mp3 format !" % filename)
+                        total_files_not_mp3 += 1
+                    else:
+                        print_success("--> File: \"%s\" copied successfully !" % filename)
                     total_copied_files += 1
                 else:
                     print_warning("--> File: \"%s\" was found in the destination folder !" % filename)
@@ -72,6 +78,7 @@ def process_copy(path_to_search, path_to_copy):
     print_success("-------------------Summary process-------------------")
     print_success("Total new files copied: %s" % total_copied_files)
     print_warning("Total files not found in the list: %s" % total_files_not_match)
+    print_warning("Total files not mp3: %s" % total_files_not_mp3)
     print_warning("Total files matching list but already in destination folder: %s" % total_files_destination)
     print_success("-----------------------------------------------------")
     print_standard("")
