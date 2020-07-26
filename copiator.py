@@ -50,6 +50,7 @@ def process_copy(path_to_search, path_to_copy):
 
     total_copied_files = 0
     total_files_not_match = 0
+    total_files_not_copied = 0
 
     with open('files_to_search.txt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -57,8 +58,12 @@ def process_copy(path_to_search, path_to_copy):
             if filename_to_search[0] in files_search_dir:
                 full_path_file = join(path_to_search, filename_to_search[0])
                 copy(full_path_file, path_to_copy)
-                print_success("--> File: \"%s\" copied successfully !" % filename_to_search[0])
-                total_copied_files += 1
+                if exists(join(path_to_copy, filename_to_search[0])):
+                    print_success("--> File: \"%s\" copied successfully !" % filename_to_search[0])
+                    total_copied_files += 1
+                else:
+                    print_error("--> File: \"%s\" not copied !" % filename_to_search[0])
+                    total_files_not_copied =+ 1
             else:
                 print_warning("--> File: \"%s\" was not found in the directory search" % filename_to_search[0])
                 total_files_not_match += 1
@@ -67,6 +72,7 @@ def process_copy(path_to_search, path_to_copy):
     print_success("-------------------Summary process-------------------")
     print_success("Total new files copied: %s" % total_copied_files)
     print_warning("Total files not found in the list: %s" % total_files_not_match)
+    print_error("Total files found but not copied: %s" % total_files_not_copied)
     print_success("-----------------------------------------------------")
     print_standard("")
 
