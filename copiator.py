@@ -41,50 +41,36 @@ def process_copy(path_to_search, path_to_copy):
         print_error("The path \"%s\" doesn't exists but it will be created for this purpose :)" % path_to_search)
         mkdir(path_to_copy)
 
-    files_to_copy = []
-    with open('files_to_search.txt') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        for row in spamreader:
-            files_to_copy.append(row[0])
-
+    files_search_dir = []
     dir_search = listdir(path_to_search)
-    total_copied_files = 0
-    total_files_not_match = 0
-    total_files_destination = 0
-    total_files_not_mp3 = 0
-    if len(dir_search) == 0:
-        print_error("There are no files in this directory :(")
     for filename in dir_search:
         full_path_file = join(path_to_search, filename)
-        if isfile(full_path_file):
-            files_splitted = filename.split(".")
-            if files_splitted[0] in files_to_copy:
-                if not exists(join(path_to_copy, filename)):
-                    copy(full_path_file, path_to_copy)
-                    if files_splitted[1] is not "mp3":
-                        print_error("--> File: \"%s\" copied successfully but is not a mp3 format !" % filename)
-                        total_files_not_mp3 += 1
-                    else:
-                        print_success("--> File: \"%s\" copied successfully !" % filename)
-                    total_copied_files += 1
-                else:
-                    print_warning("--> File: \"%s\" was found in the destination folder !" % filename)
-                    total_files_destination += 1
+        if isfile(full_path_file) and filename != ".DS_Store":
+            files_search_dir.append(filename)
+
+    total_copied_files = 0
+    total_files_not_match = 0
+
+    with open('files_to_search.txt') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for filename_to_search in spamreader:
+            if filename_to_search[0] in files_search_dir:
+                full_path_file = join(path_to_search, filename_to_search[0])
+                copy(full_path_file, path_to_copy)
+                print_success("--> File: \"%s\" copied successfully !" % filename_to_search[0])
+                total_copied_files += 1
             else:
-                print_warning("--> File: \"%s\" was not found in the file list to copy" % filename)
+                print_warning("--> File: \"%s\" was not found in the directory search" % filename_to_search[0])
                 total_files_not_match += 1
     
     print_standard("")
     print_success("-------------------Summary process-------------------")
     print_success("Total new files copied: %s" % total_copied_files)
     print_warning("Total files not found in the list: %s" % total_files_not_match)
-    print_warning("Total files not mp3: %s" % total_files_not_mp3)
-    print_warning("Total files matching list but already in destination folder: %s" % total_files_destination)
     print_success("-----------------------------------------------------")
     print_standard("")
 
 def main(argv):
-   file_names = ''
    path_to_search = ''
    path_to_copy = ''
    try:
