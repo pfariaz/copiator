@@ -35,10 +35,10 @@ def print_warning(msg):
 
 def process_copy(path_to_search, path_to_copy):
     if not exists(path_to_search):
-        print_error("The path \"%s\" doesn't exists" % path_to_search)
+        print_error("La carpeta \"%s\" no existe" % path_to_search)
         return
     if not exists(path_to_copy):
-        print_error("The path \"%s\" doesn't exists but it will be created for this purpose :)" % path_to_search)
+        print_error("La carpeta \"%s\" no existe pero la crearemos para este proposito :)" % path_to_search)
         mkdir(path_to_copy)
 
     files_search_dir = []
@@ -58,35 +58,35 @@ def process_copy(path_to_search, path_to_copy):
     with open('files_to_search.txt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for filename_to_search in spamreader:
+            total_files_to_copy +=1 
             if filename_to_search[0] in files_search_dir:
                 full_path_file = join(path_to_search, filename_to_search[0])
                 destination_final_name = join(path_to_copy, filename_to_search[0])
                 if exists(destination_final_name):
-                    print_error("--> File({}): \"{}\" exists in the destination folder (DUPLICATED) !".format(line_number,filename_to_search[0]))
+                    print_error("--> Archivo({}): \"{}\" ya existe en la carpeta de destino (DUPLICADO) !".format(line_number,filename_to_search[0]))
                     total_duplicated_files += 1
                     continue
                 copy(full_path_file, destination_final_name)
-                print_standard("trying to copy from {} to {}".format(full_path_file, destination_final_name))
+                print_standard("Tratando de copiar de {} a {}".format(full_path_file, destination_final_name))
                 if exists(destination_final_name):
-                    print_success("--> File({}): \"{}\" copied successfully !".format(line_number,filename_to_search[0]))
+                    print_success("--> Archivo({}): \"{}\" copiado exitosamente !".format(line_number,filename_to_search[0]))
                     total_copied_files += 1
                 else:
-                    print_error("--> File({}): \"{}\" not copied !".format(line_number,filename_to_search[0]))
+                    print_error("--> Archivo({}): \"{}\" no se pudo copiar !".format(line_number,filename_to_search[0]))
                     total_files_not_copied =+ 1
             else:
-                print_warning("--> File({}): \"{}\" was not found in the directory search".format(line_number,filename_to_search[0]))
+                print_warning("--> Archivo({}): \"{}\" no fue encontrado en la carpeta de busqueda".format(line_number,filename_to_search[0]))
                 total_files_not_match += 1
             line_number +=1
-            total_files_to_copy +=1 
     
     print_standard("")
     print_success("-------------------Summary process-------------------")
-    print_success("Total Files in search directory: %s" % len(files_search_dir))
-    print_success("Total Files to copy: %s" % total_files_to_copy)
-    print_success("Total Files copied: %s" % total_copied_files)
-    print_warning("Total Files not found in the list: %s" % total_files_not_match)
-    print_error("Total Files found but not copied: %s" % total_files_not_copied)
-    print_error("Total duplicated files: %s" % total_duplicated_files)
+    print_success("Total de archivos en la carpeta de busqueda: %s" % len(files_search_dir))
+    print_success("Total de archivos a copiar: %s" % total_files_to_copy)
+    print_success("Total de archivos copiados: %s" % total_copied_files)
+    print_warning("Total de archivos que no se encuentran en la carpeta de busqueda: %s" % total_files_not_match)
+    print_error("Total de archivos encontrados pero no copiados: %s" % total_files_not_copied)
+    print_error("Total de archivos duplicados: %s" % total_duplicated_files)
     print_success("-----------------------------------------------------")
     print_standard("")
 
@@ -96,21 +96,21 @@ def main(argv):
    try:
       opts, args = getopt.getopt(argv,"hs:o:",["pathsearch=","pathout="])
    except getopt.GetoptError:
-      print('Usage: test.py -s <path_to_search> -o <path_to_copy>')
+      print('Usage: copiator.py -s <carpeta_a_buscar> -o <carpeta_a_copiar>')
       sys.exit(2)
 
    for opt, arg in opts:
       if opt == '-h':
-         print('Usage: test.py -s <path_to_search> -o <path_to_copy>')
+         print('Usage: copiator.py -s <carpeta_a_buscar> -o <carpeta_a_copiar>')
          sys.exit()
       elif opt in ("-s", "--pathsearch"):
          path_to_search = arg
       elif opt in ("-o", "--pathout"):
          path_to_copy = arg
 
-   print("Initializing....")
+   print("Iniciando....")
    process_copy(path_to_search, path_to_copy)
-   print_success("Process finished")
+   print_success("Proceso finalizado")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
